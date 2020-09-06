@@ -50,6 +50,7 @@ def computeCost(X, y, theta):
 X, y = read_from_txt('data1.csv')
 
 theta, J = gradientDescent(X, y, 0.01, 2500)
+print('theta:',theta)
 plt.plot( J)
 plt.show()
 

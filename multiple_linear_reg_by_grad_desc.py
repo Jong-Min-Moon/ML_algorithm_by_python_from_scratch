@@ -21,7 +21,6 @@ def featureNormalize(X):
     """
     X_features = X[:, 1:]
     mu = np.mean(X_features, axis = 0)
-    print(mu)
     sigma = np.std(X_features, axis = 0)
     X_normalized = (X_features - mu) / sigma
     X_norm = np.concatenate((np.ones(len(X)).reshape(-1, 1),X_normalized), axis = 1)
@@ -64,12 +63,18 @@ def computeCost(X, y, theta):
     J = 1 / (2*m) * np.matmul( error_vector.T , error_vector).item()
     return J
 
+
+def Normal_eq(X, y):
+    inv_XtX = np.linalg.inv(np.matmul(X.T, X)) 
+    theta_opt = np.matmul(np.matmul(inv_XtX, X.T), y)
+    return theta_opt
+
 X, y = read_from_txt('data2.csv')
-print(X)
-print(y)
+
 X_scaled, mean, sigma = featureNormalize(X)
 theta, J = gradientDescent(X_scaled, y, 1.2, 500)
-
+print('theta:',theta)
 plt.plot( J)
 plt.show()
 
+print('theta_normal', Normal_eq(X_scaled, y)) #the same result. In practice, no need for scaling when using normal equation.
