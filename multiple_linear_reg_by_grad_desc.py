@@ -10,20 +10,38 @@ def read_from_txt(data_dir):
     return X, y
 
 
+def featureNormalize(X):
+    """
+    Normalizes the features in X
+    returns a normalized version of X where
+    the mean value of each feature is 0 and the standard deviation
+    is 1. This is often a good preprocessing step to do when
+    working with learning algorithms.
+    We should save mean and sigma for evaluation of new input data.
+    """
+    X_features = X[:, 1:]
+    mu = np.mean(X_features, axis = 0)
+    print(mu)
+    sigma = np.std(X_features, axis = 0)
+    X_normalized = (X_features - mu) / sigma
+    X_norm = np.concatenate((np.ones(len(X)).reshape(-1, 1),X_normalized), axis = 1)
+    return X_norm, mu, sigma
+
+
 def gradientDescent(X, y, alpha, n_iter):
     """
     Performs gradient descent to learn theta
     updates theta by taking num_iters gradient steps with learning rate alpha
     """
-
-    m = len(y) # number of training examples
+    n_features = X.shape[1]
+    n_samples = len(y) # number of training examples
     J_history = np.zeros(n_iter)
-    theta = np.zeros(2).reshape(-1,1)
+    theta = np.zeros(n_features).reshape(-1,1)
     
     for iter in range(n_iter):
         Xt = np.transpose(X)
         delta = np.matmul(Xt, np.matmul(X, theta) - y)
-        theta -= alpha / m * delta
+        theta -= alpha / n_samples * delta
 
         J_now = computeCost(X, y, theta)
         J_history[iter] = J_now #Save the cost J in every iteration   
@@ -41,15 +59,17 @@ def computeCost(X, y, theta):
     as the parameter for linear regression to fit the data points in X and y
     """
     theta_vec = np.array(theta).reshape(-1, 1)
-    n_samples = len(y)  # number of training examples
+    m = len(y)  # number of training examples
     error_vector = np.matmul(X, theta_vec) - y
-    J = 1 / (2 * n_samples) * np.matmul( error_vector.T , error_vector).item()
+    J = 1 / (2*m) * np.matmul( error_vector.T , error_vector).item()
     return J
 
+X, y = read_from_txt('data2.csv')
+print(X)
+print(y)
+X_scaled, mean, sigma = featureNormalize(X)
+theta, J = gradientDescent(X_scaled, y, 1.2, 500)
 
-X, y = read_from_txt('data1.csv')
-
-theta, J = gradientDescent(X, y, 0.01, 2500)
 plt.plot( J)
 plt.show()
 
