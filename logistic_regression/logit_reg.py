@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import scipy
+from scipy.optimize import minimize
 def read_from_txt(data_dir):
     table = pd.read_csv(data_dir).to_numpy()
     X = table[:, :-1]
@@ -26,10 +27,8 @@ def grad(X, y, theta):
     m = len(y)
     theta_colvec = theta.reshape(-1,1)
     y_pred = sigmoid(np.matmul(X, theta_colvec))   
-    #print('y_pred', y_pred)
     grad_vec = np.matmul(X.T, y_pred - y) / m
-    #print('grad_vec', grad_vec)
-    return grad_vec
+    return grad_vec.reshape(-1)
 
 
 def learn_by_grad_desc(X, y, alpha, n_iter):
@@ -53,12 +52,15 @@ X, y = read_from_txt('data1.csv')
 # plt.legend()
 # plt.show()
 
-J_values, theta = learn_by_grad_desc(X, y, 0.001, 100000)
-print(theta)
+res = minimize(lambda t : cost(X, y, t), np.array([0,0,0]), method='BFGS', jac = lambda t : grad(X, y, t),
+               options={'disp': True})
+print(res)
+# J_values, theta = learn_by_grad_desc(X, y, 0.001, 100000)
+# print(theta)
 
 
-plt.plot(J_values)
-plt.show()  
+# plt.plot(J_values)
+# plt.show()  
 
 # J_test = cost(X, y, np.array([0, 0, 0]))
 # grad_test = grad(X, y, np.array([0, 0, 0]))
